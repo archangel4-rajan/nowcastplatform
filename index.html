@@ -3,237 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nowcast Platform - AI & ML Consulting</title>
-    <style>
-        /* Reset and Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: #ffffff;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Header */
-        header {
-            padding: 40px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.2);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 10;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(0); }
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-        }
-
-        nav ul li {
-            margin-left: 30px;
-        }
-
-        nav ul li a {
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 16px;
-            transition: color 0.3s ease;
-        }
-
-        nav ul li a:hover {
-            color: #00d4ff;
-        }
-
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 0 5%;
-        }
-
-        .hero-content h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            background: linear-gradient(to right, #00d4ff, #ff007a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        .hero-content p {
-            font-size: 20px;
-            max-width: 600px;
-            margin: 0 auto 30px;
-            color: #d3d3d3;
-            animation: fadeInUp 1.2s ease-out;
-        }
-
-        .cta-btn {
-            display: inline-block;
-            padding: 15px 40px;
-            background: #00d4ff;
-            color: #0f0c29;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 50px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            animation: pulse 2s infinite;
-        }
-
-        .cta-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.5);
-            animation: none;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(0, 212, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0); }
-        }
-
-        /* Features Section */
-        .features {
-            padding: 80px 5%;
-            text-align: center;
-        }
-
-        .features h2 {
-            font-size: 36px;
-            margin-bottom: 50px;
-            color: #00d4ff;
-            animation: fadeIn 1s ease-out;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            border-radius: 15px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            opacity: 0;
-            animation: cardFadeIn 1s ease-out forwards;
-        }
-
-        .feature-card:nth-child(1) { animation-delay: 0.2s; }
-        .feature-card:nth-child(2) { animation-delay: 0.4s; }
-        .feature-card:nth-child(3) { animation-delay: 0.6s; }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
-        }
-
-        .feature-card h3 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #ffffff;
-        }
-
-        .feature-card p {
-            font-size: 16px;
-            color: #d3d3d3;
-        }
-
-        @keyframes cardFadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Footer */
-        footer {
-            padding: 20px 5%;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.3);
-            font-size: 14px;
-            animation: fadeIn 1.5s ease-out;
-        }
-    </style>
+    <title>NowCast - Simplify Your Money</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
-        <div class="logo">Nowcast Platform</div>
-        <nav>
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
+    <header class="hero">
+        <img src="assets/logo.svg" alt="NowCast Logo" class="logo">
+        <h1>Simplify Your Money</h1>
+        <img src="assets/graphic.svg" alt="Hero Graphic" class="hero-graphic">
     </header>
-
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <h1>Applied AI & Machine Learning</h1>
-            <p>Transforming businesses with cutting-edge AI solutions tailored to your needs by your boy RAJ.</p>
-            <a href="#contact" class="cta-btn">Get Started</a>
+    <section class="projects-grid">
+        <h2>Your Finances, One View</h2>
+        <div class="grid">
+            <div class="card"><img src="assets/placeholder.jpg" alt="Brokerages" loading="lazy"><p>Brokerages</p></div>
+            <div class="card"><img src="assets/placeholder.jpg" alt="Crypto" loading="lazy"><p>Crypto</p></div>
+            <div class="card"><img src="assets/placeholder.jpg" alt="Banks" loading="lazy"><p>Banks</p></div>
         </div>
     </section>
-
-    <section class="features" id="services">
-        <h2>Our Services</h2>
-        <div class="feature-grid">
-            <div class="feature-card">
-                <h3>Predictive Analytics</h3>
-                <p>Leverage machine learning to forecast trends and optimize decision-making.</p>
-            </div>
-            <div class="feature-card">
-                <h3>AI Consulting</h3>
-                <p>Expert guidance to integrate AI seamlessly into your operations.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Custom ML Solutions</h3>
-                <p>Bespoke models designed to solve your unique challenges.</p>
-            </div>
-        </div>
+    <section class="cta">
+        <a href="contact.html" class="btn">Get in Touch</a>
     </section>
-
-    <footer id="contact">
-        <p>© 2025 Nowcast Platform. All rights reserved. | Contact: info@nowcastplatform.com</p>
-    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
