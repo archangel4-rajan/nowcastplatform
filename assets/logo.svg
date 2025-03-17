@@ -1,0 +1,6 @@
+<svg width="200" height="50" xmlns="http://www.w3.org/2000/svg">
+    <text x="10" y="35" font-family="Arial" font-size="30" fill="#333">
+        NowCast
+    </text>
+    <circle cx="170" cy="25" r="15" fill="#4CAF50"/>
+</svg>
