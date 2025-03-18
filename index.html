@@ -4,27 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NowCast - Simplify Your Money</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="150" height="40" viewBox="0 0 150 40">
+                <text x="10" y="28" font-family="Arial" font-size="24" fill="#333">NowCast</text>
+                <circle cx="130" cy="20" r="8" fill="#4CAF50"/>
+            </svg>
+        </div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#solutions">Solutions</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#about">About</a>
+            <a href="#contact" class="cta-button">Contact Us</a>
+        </div>
+    </nav>
+
     <header class="hero">
-        <img src="assets/logo.svg" alt="NowCast Logo" class="logo">
-        <h1>Simplify Your Money</h1>
-        <img src="assets/graphic.svg" alt="Hero Graphic" class="hero-graphic">
+        <div class="hero-content">
+            <h1>Real-time Financial Analytics</h1>
+            <p>Make informed decisions with comprehensive market data across brokerages, crypto, and banking sectors.</p>
+            <div class="cta-buttons">
+                <a href="#demo" class="primary-button">Request Demo</a>
+                <a href="#learn" class="secondary-button">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-graphic">
+            <!-- Simple analytics graph SVG -->
+            <svg width="500" height="300" viewBox="0 0 500 300">
+                <path d="M 50 250 Q 150 50 250 150 T 450 100" 
+                      fill="none" 
+                      stroke="#4CAF50" 
+                      stroke-width="3"/>
+                <path d="M 50 200 Q 150 250 250 200 T 450 150" 
+                      fill="none" 
+                      stroke="#2196F3" 
+                      stroke-width="3"/>
+                <g stroke="#ddd">
+                    <line x1="50" y1="50" x2="50" y2="250"/>
+                    <line x1="50" y1="250" x2="450" y2="250"/>
+                </g>
+            </svg>
+        </div>
     </header>
-    <section class="projects-grid">
-        <h2>Your Finances, One View</h2>
-        <div class="grid">
-            <div class="card"><img src="assets/placeholder.jpg" alt="Brokerages" loading="lazy"><p>Brokerages</p></div>
-            <div class="card"><img src="assets/placeholder.jpg" alt="Crypto" loading="lazy"><p>Crypto</p></div>
-            <div class="card"><img src="assets/placeholder.jpg" alt="Banks" loading="lazy"><p>Banks</p></div>
+
+    <section id="features" class="features">
+        <h2>Our Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <svg width="60" height="60" viewBox="0 0 60 60">
+                    <rect x="10" y="10" width="40" height="40" fill="#4CAF50" rx="5"/>
+                    <path d="M20 30 L30 40 L40 20" stroke="white" stroke-width="3" fill="none"/>
+                </svg>
+                <h3>Real-time Updates</h3>
+                <p>Get instant notifications on market changes and trends</p>
+            </div>
+            <!-- Add more feature cards -->
         </div>
     </section>
-    <section class="cta">
-        <a href="contact.html" class="btn">Get in Touch</a>
+
+    <section id="solutions" class="solutions">
+        <h2>Solutions</h2>
+        <div class="solution-cards">
+            <div class="card">
+                <svg width="300" height="200" viewBox="0 0 300 200">
+                    <rect width="300" height="200" fill="#f5f5f5"/>
+                    <path d="M 50 150 Q 150 50 250 100" stroke="#4CAF50" stroke-width="2" fill="none"/>
+                    <text x="150" y="180" text-anchor="middle" fill="#333">Brokerages</text>
+                </svg>
+                <h3>Brokerages</h3>
+                <p>Comprehensive market data integration for brokerages</p>
+            </div>
+            <!-- Similar cards for Crypto and Banks -->
+        </div>
     </section>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <script src="js/script.js"></script>
+
+    <section id="pricing" class="pricing">
+        <h2>Pricing Plans</h2>
+        <div class="pricing-cards">
+            <!-- Add pricing tiers -->
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <h2>Get in Touch</h2>
+        <form class="contact-form">
+            <input type="text" placeholder="Name">
+            <input type="email" placeholder="Email">
+            <textarea placeholder="Message"></textarea>
+            <button type="submit" class="primary-button">Send Message</button>
+        </form>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>NowCast</h4>
+                <p>Making financial data accessible and actionable</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <a href="#features">Features</a>
+                <a href="#solutions">Solutions</a>
+                <a href="#pricing">Pricing</a>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>Email: info@nowcast.com</p>
+                <p>Phone: (555) 123-4567</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 NowCast. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 </html>
