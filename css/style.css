@@ -2,7 +2,7 @@
     --primary-color: #4CAF50;
     --secondary-color: #2196F3;
     --text-color: #333;
-    --background-light: #fffff0;
+    --background-light: #f5f5f5;
     --spacing-unit: 1rem;
 }
 
@@ -16,7 +16,13 @@ body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
     color: var(--text-color);
-    background-color: var(--background-light);
+}
+
+/* Add a container for center alignment */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-unit);
 }
 
 /* Navbar */
@@ -24,13 +30,20 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
+    padding: var(--spacing-unit) 0;
     background: white;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     position: fixed;
     width: 100%;
     top: 0;
     z-index: 1000;
+}
+
+.navbar > .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
 .nav-links a {
@@ -44,7 +57,7 @@ body {
     display: flex;
     align-items: center;
     min-height: 80vh;
-    padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 2);
+    padding: calc(var(--spacing-unit) * 4) 0;
     margin-top: 60px;
 }
 
@@ -81,7 +94,7 @@ body {
 
 /* Sections */
 section {
-    padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 2);
+    padding: calc(var(--spacing-unit) * 4) 0;
 }
 
 h2 {
@@ -122,7 +135,7 @@ h2 {
 /* Footer */
 footer {
     background: #fff5e6;
-    padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 2);
+    padding: calc(var(--spacing-unit) * 4) 0;
 }
 
 .footer-content {
