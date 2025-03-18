@@ -2,7 +2,7 @@
     --primary-color: #4CAF50;
     --secondary-color: #2196F3;
     --text-color: #333;
-    --background-light: #f5f5f5;
+    --background-light: #fffff0;
     --spacing-unit: 1rem;
 }
 
@@ -16,6 +16,7 @@ body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
     color: var(--text-color);
+    background-color: var(--background-light);
 }
 
 /* Navbar */
@@ -120,7 +121,7 @@ h2 {
 
 /* Footer */
 footer {
-    background: var(--background-light);
+    background: #fff5e6;
     padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 2);
 }
 
