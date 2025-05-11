@@ -5,14 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NowCast - Simplify Your Money</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
             <div class="logo">
                 <svg width="150" height="40" viewBox="0 0 150 40">
-                    <text x="10" y="28" font-family="Arial" font-size="24" fill="#333">NowCast</text>
-                    <circle cx="130" cy="20" r="8" fill="#4CAF50"/>
+                    <text x="10" y="28" font-family="Inter" font-size="24" fill="#2563eb">NowCast</text>
+                    <circle cx="130" cy="20" r="8" fill="#10b981"/>
                 </svg>
             </div>
             <div class="nav-links">
@@ -36,20 +40,58 @@
                 </div>
             </div>
             <div class="hero-graphic">
-                <!-- Simple analytics graph SVG -->
                 <svg width="500" height="300" viewBox="0 0 500 300">
-                    <path d="M 50 250 Q 150 50 250 150 T 450 100" 
-                          fill="none" 
-                          stroke="#4CAF50" 
-                          stroke-width="3"/>
-                    <path d="M 50 200 Q 150 250 250 200 T 450 150" 
-                          fill="none" 
-                          stroke="#2196F3" 
-                          stroke-width="3"/>
-                    <g stroke="#ddd">
-                        <line x1="50" y1="50" x2="50" y2="250"/>
-                        <line x1="50" y1="250" x2="450" y2="250"/>
+                    <!-- Background Grid -->
+                    <defs>
+                        <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+                            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+                        </pattern>
+                    </defs>
+                    <rect width="500" height="300" fill="url(#grid)"/>
+                    
+                    <!-- Connection Lines -->
+                    <g stroke="#2563eb" stroke-width="2" fill="none">
+                        <!-- Main connections -->
+                        <path d="M 100 150 L 200 100" stroke-dasharray="4"/>
+                        <path d="M 200 100 L 300 150" stroke-dasharray="4"/>
+                        <path d="M 300 150 L 400 100" stroke-dasharray="4"/>
+                        <path d="M 100 150 L 200 200" stroke-dasharray="4"/>
+                        <path d="M 200 200 L 300 150" stroke-dasharray="4"/>
+                        <path d="M 300 150 L 400 200" stroke-dasharray="4"/>
                     </g>
+
+                    <!-- Nodes -->
+                    <g>
+                        <!-- Central Node -->
+                        <circle cx="300" cy="150" r="15" fill="#2563eb"/>
+                        <text x="300" y="155" text-anchor="middle" fill="white" font-size="12">NowCast</text>
+                        
+                        <!-- Brokerage Node -->
+                        <circle cx="100" cy="150" r="12" fill="#10b981"/>
+                        <text x="100" y="155" text-anchor="middle" fill="white" font-size="10">Broker</text>
+                        
+                        <!-- Crypto Node -->
+                        <circle cx="200" cy="100" r="12" fill="#10b981"/>
+                        <text x="200" y="105" text-anchor="middle" fill="white" font-size="10">Crypto</text>
+                        
+                        <!-- Bank Node -->
+                        <circle cx="200" cy="200" r="12" fill="#10b981"/>
+                        <text x="200" y="205" text-anchor="middle" fill="white" font-size="10">Bank</text>
+                        
+                        <!-- Analytics Node -->
+                        <circle cx="400" cy="100" r="12" fill="#10b981"/>
+                        <text x="400" y="105" text-anchor="middle" fill="white" font-size="10">Analytics</text>
+                        
+                        <!-- Portfolio Node -->
+                        <circle cx="400" cy="200" r="12" fill="#10b981"/>
+                        <text x="400" y="205" text-anchor="middle" fill="white" font-size="10">Portfolio</text>
+                    </g>
+
+                    <!-- Animated Pulse Effect -->
+                    <circle cx="300" cy="150" r="20" fill="none" stroke="#2563eb" stroke-width="2">
+                        <animate attributeName="r" values="20;30;20" dur="2s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite"/>
+                    </circle>
                 </svg>
             </div>
         </div>
@@ -60,14 +102,20 @@
             <h2>Our Features</h2>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <svg width="60" height="60" viewBox="0 0 60 60">
-                        <rect x="10" y="10" width="40" height="40" fill="#4CAF50" rx="5"/>
-                        <path d="M20 30 L30 40 L40 20" stroke="white" stroke-width="3" fill="none"/>
-                    </svg>
+                    <i data-feather="activity" width="40" height="40" stroke="#2563eb"></i>
                     <h3>Real-time Updates</h3>
                     <p>Get instant notifications on market changes and trends</p>
                 </div>
-                <!-- Add more feature cards -->
+                <div class="feature-card">
+                    <i data-feather="shield" width="40" height="40" stroke="#2563eb"></i>
+                    <h3>Secure Integration</h3>
+                    <p>Bank-level security for all your financial data</p>
+                </div>
+                <div class="feature-card">
+                    <i data-feather="trending-up" width="40" height="40" stroke="#2563eb"></i>
+                    <h3>Smart Analytics</h3>
+                    <p>AI-powered insights for better decision making</p>
+                </div>
             </div>
         </div>
     </section>
@@ -77,15 +125,26 @@
             <h2>Solutions</h2>
             <div class="solution-cards">
                 <div class="card">
-                    <svg width="300" height="200" viewBox="0 0 300 200">
-                        <rect width="300" height="200" fill="#f5f5f5"/>
-                        <path d="M 50 150 Q 150 50 250 100" stroke="#4CAF50" stroke-width="2" fill="none"/>
-                        <text x="150" y="180" text-anchor="middle" fill="#333">Brokerages</text>
-                    </svg>
-                    <h3>Brokerages</h3>
-                    <p>Comprehensive market data integration for brokerages</p>
+                    <div class="card-content">
+                        <i data-feather="briefcase" width="40" height="40" stroke="#2563eb"></i>
+                        <h3>Brokerages</h3>
+                        <p>Comprehensive market data integration for brokerages</p>
+                    </div>
                 </div>
-                <!-- Similar cards for Crypto and Banks -->
+                <div class="card">
+                    <div class="card-content">
+                        <i data-feather="bitcoin" width="40" height="40" stroke="#2563eb"></i>
+                        <h3>Crypto</h3>
+                        <p>Real-time cryptocurrency market analysis</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <i data-feather="credit-card" width="40" height="40" stroke="#2563eb"></i>
+                        <h3>Banks</h3>
+                        <p>Integrated banking solutions for better financial management</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -94,7 +153,42 @@
         <div class="container">
             <h2>Pricing Plans</h2>
             <div class="pricing-cards">
-                <!-- Add pricing tiers -->
+                <div class="card">
+                    <div class="card-content">
+                        <h3>Starter</h3>
+                        <p class="price">$49<span>/month</span></p>
+                        <ul>
+                            <li>Basic market data</li>
+                            <li>5 API integrations</li>
+                            <li>Email support</li>
+                        </ul>
+                        <a href="#contact" class="primary-button">Get Started</a>
+                    </div>
+                </div>
+                <div class="card featured">
+                    <div class="card-content">
+                        <h3>Professional</h3>
+                        <p class="price">$99<span>/month</span></p>
+                        <ul>
+                            <li>Advanced analytics</li>
+                            <li>Unlimited integrations</li>
+                            <li>Priority support</li>
+                        </ul>
+                        <a href="#contact" class="primary-button">Get Started</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <h3>Enterprise</h3>
+                        <p class="price">Custom</p>
+                        <ul>
+                            <li>Custom solutions</li>
+                            <li>Dedicated support</li>
+                            <li>SLA guarantee</li>
+                        </ul>
+                        <a href="#contact" class="primary-button">Contact Sales</a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -103,9 +197,15 @@
         <div class="container">
             <h2>Get in Touch</h2>
             <form class="contact-form">
-                <input type="text" placeholder="Name">
-                <input type="email" placeholder="Email">
-                <textarea placeholder="Message"></textarea>
+                <div class="form-group">
+                    <input type="text" placeholder="Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <textarea placeholder="Message" required></textarea>
+                </div>
                 <button type="submit" class="primary-button">Send Message</button>
             </form>
         </div>
@@ -135,5 +235,9 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        feather.replace();
+    </script>
 </body>
 </html>
