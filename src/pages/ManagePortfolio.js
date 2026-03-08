@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import PortfolioTable from '../components/PortfolioTable';
-import { ASSET_TYPES } from '../constants/tags';
+import { ASSET_TYPES, TRADE_DIRECTIONS } from '../constants/tags';
 
 function ManagePortfolio() {
   const { id } = useParams();
@@ -11,10 +11,13 @@ function ManagePortfolio() {
   const { user } = useAuth();
   const [strategy, setStrategy] = useState(null);
   const [holdings, setHoldings] = useState([]);
+  const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingTrade, setSavingTrade] = useState(false);
   const [error, setError] = useState('');
+  const [tradeError, setTradeError] = useState('');
 
   const [newHolding, setNewHolding] = useState({
     ticker: '',
@@ -22,6 +25,19 @@ function ManagePortfolio() {
     allocation_pct: '',
     entry_price: '',
     notes: '',
+  });
+
+  const [newTrade, setNewTrade] = useState({
+    direction: 'buy',
+    ticker: '',
+    market_type: 'stock',
+    quantity: '',
+    price: '',
+    rationale: '',
+    price_target: '',
+    stop_loss: '',
+    conviction: '3',
+    resolution_date: '',
   });
 
   const fetchData = useCallback(async () => {
@@ -46,6 +62,20 @@ function ManagePortfolio() {
       .order('allocation_pct', { ascending: false });
 
     setHoldings(holds || []);
+
+    // Fetch trades (table may not exist yet)
+    try {
+      const { data: tradeData } = await supabase
+        .from('nc_trades')
+        .select('*')
+        .eq('strategy_id', id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+      setTrades(tradeData || []);
+    } catch {
+      setTrades([]);
+    }
+
     setLoading(false);
   }, [id, user.id, navigate]);
 
@@ -114,6 +144,72 @@ function ManagePortfolio() {
     fetchData();
   }
 
+  async function handleLogTrade(e) {
+    e.preventDefault();
+    setTradeError('');
+
+    if (!newTrade.ticker.trim()) {
+      setTradeError('Ticker is required.');
+      return;
+    }
+    if (!newTrade.quantity || Number(newTrade.quantity) <= 0) {
+      setTradeError('Quantity must be greater than 0.');
+      return;
+    }
+    if (!newTrade.price || Number(newTrade.price) <= 0) {
+      setTradeError('Price must be greater than 0.');
+      return;
+    }
+
+    setSavingTrade(true);
+
+    try {
+      const payload = {
+        strategy_id: id,
+        direction: newTrade.direction,
+        ticker: newTrade.ticker.trim().toUpperCase(),
+        market_type: newTrade.market_type,
+        quantity: Number(newTrade.quantity),
+        price: Number(newTrade.price),
+        rationale: newTrade.rationale.trim() || null,
+        price_target: newTrade.price_target ? Number(newTrade.price_target) : null,
+        stop_loss: newTrade.stop_loss ? Number(newTrade.stop_loss) : null,
+        conviction: Number(newTrade.conviction),
+        resolution_date: newTrade.market_type === 'prediction' && newTrade.resolution_date
+          ? newTrade.resolution_date
+          : null,
+      };
+
+      const { error: insertError } = await supabase
+        .from('nc_trades')
+        .insert(payload);
+
+      if (insertError) {
+        setTradeError(insertError.message);
+        setSavingTrade(false);
+        return;
+      }
+
+      setNewTrade({
+        direction: 'buy',
+        ticker: '',
+        market_type: 'stock',
+        quantity: '',
+        price: '',
+        rationale: '',
+        price_target: '',
+        stop_loss: '',
+        conviction: '3',
+        resolution_date: '',
+      });
+      setSavingTrade(false);
+      fetchData();
+    } catch (err) {
+      setTradeError('Failed to log trade. The trades table may not be set up yet.');
+      setSavingTrade(false);
+    }
+  }
+
   if (loading) {
     return <div className="container"><div className="loading">Loading...</div></div>;
   }
@@ -131,6 +227,183 @@ function ManagePortfolio() {
           <Link to="/creator" className="btn btn-secondary">Back to Dashboard</Link>
         </div>
 
+        {/* Trade Log - Primary Section */}
+        <div className="dashboard-card" style={{ marginBottom: '24px' }}>
+          <div className="card-header-actions">
+            <h3>Log Trade</h3>
+          </div>
+
+          <form className="trade-log-form" onSubmit={handleLogTrade}>
+            {tradeError && <div className="notification error">{tradeError}</div>}
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="trade-direction">Direction</label>
+                <select
+                  id="trade-direction"
+                  value={newTrade.direction}
+                  onChange={e => setNewTrade({ ...newTrade, direction: e.target.value })}
+                >
+                  {TRADE_DIRECTIONS.map(d => (
+                    <option key={d} value={d}>{d.charAt(0).toUpperCase() + d.slice(1)}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="trade-ticker">Ticker</label>
+                <input
+                  id="trade-ticker"
+                  type="text"
+                  value={newTrade.ticker}
+                  onChange={e => setNewTrade({ ...newTrade, ticker: e.target.value })}
+                  placeholder="e.g., BTC"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="trade-market-type">Market Type</label>
+                <select
+                  id="trade-market-type"
+                  value={newTrade.market_type}
+                  onChange={e => setNewTrade({ ...newTrade, market_type: e.target.value })}
+                >
+                  {ASSET_TYPES.map(t => (
+                    <option key={t} value={t}>{t.toUpperCase()}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="trade-quantity">Quantity</label>
+                <input
+                  id="trade-quantity"
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={newTrade.quantity}
+                  onChange={e => setNewTrade({ ...newTrade, quantity: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="trade-price">Price ($)</label>
+                <input
+                  id="trade-price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={newTrade.price}
+                  onChange={e => setNewTrade({ ...newTrade, price: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="trade-price-target">Price Target ($)</label>
+                <input
+                  id="trade-price-target"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={newTrade.price_target}
+                  onChange={e => setNewTrade({ ...newTrade, price_target: e.target.value })}
+                  placeholder="Optional"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="trade-stop-loss">Stop Loss ($)</label>
+                <input
+                  id="trade-stop-loss"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={newTrade.stop_loss}
+                  onChange={e => setNewTrade({ ...newTrade, stop_loss: e.target.value })}
+                  placeholder="Optional"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="trade-conviction">Conviction (1-5)</label>
+                <select
+                  id="trade-conviction"
+                  value={newTrade.conviction}
+                  onChange={e => setNewTrade({ ...newTrade, conviction: e.target.value })}
+                >
+                  {[1, 2, 3, 4, 5].map(n => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+              </div>
+              {newTrade.market_type === 'prediction' && (
+                <div className="form-group">
+                  <label htmlFor="trade-resolution-date">Resolution Date</label>
+                  <input
+                    id="trade-resolution-date"
+                    type="date"
+                    value={newTrade.resolution_date}
+                    onChange={e => setNewTrade({ ...newTrade, resolution_date: e.target.value })}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="form-group">
+              <label htmlFor="trade-rationale">Rationale</label>
+              <textarea
+                id="trade-rationale"
+                value={newTrade.rationale}
+                onChange={e => setNewTrade({ ...newTrade, rationale: e.target.value })}
+                placeholder="Why are you making this trade?"
+                rows={3}
+              />
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="btn btn-primary" disabled={savingTrade}>
+                {savingTrade ? 'Logging...' : 'Log Trade'}
+              </button>
+            </div>
+          </form>
+
+          {trades.length > 0 && (
+            <>
+              <h4 style={{ marginTop: '24px', marginBottom: '12px', fontSize: '15px', color: '#6b7280' }}>
+                Recent Trades
+              </h4>
+              <div className="portfolio-table-wrapper">
+                <table className="trade-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Direction</th>
+                      <th>Ticker</th>
+                      <th>Qty</th>
+                      <th>Price</th>
+                      <th>Conviction</th>
+                      <th>Rationale</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {trades.map(trade => (
+                      <tr key={trade.id}>
+                        <td>{new Date(trade.created_at).toLocaleDateString()}</td>
+                        <td>
+                          <span className={`trade-direction trade-direction-${trade.direction}`}>
+                            {trade.direction}
+                          </span>
+                        </td>
+                        <td className="ticker-cell">{trade.ticker}</td>
+                        <td>{trade.quantity}</td>
+                        <td>${Number(trade.price).toFixed(2)}</td>
+                        <td>{'★'.repeat(trade.conviction || 0)}</td>
+                        <td>{trade.rationale || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Portfolio Holdings - Secondary Section */}
         <div className="portfolio-summary">
           <div className="dashboard-card">
             <h3>Portfolio Summary</h3>

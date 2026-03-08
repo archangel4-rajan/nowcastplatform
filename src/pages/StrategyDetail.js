@@ -6,12 +6,84 @@ import PortfolioTable from '../components/PortfolioTable';
 import CommentSection from '../components/CommentSection';
 import TagBadge from '../components/TagBadge';
 
+const BENCHMARK_LABELS = {
+  none: 'None',
+  sp500: 'S&P 500',
+  btc: 'Bitcoin',
+  eth: 'Ethereum',
+};
+
+function calculatePerformance(trades) {
+  const stats = {
+    totalTrades: trades.length,
+    completedTrades: 0,
+    wins: 0,
+    losses: 0,
+    totalReturnDollar: 0,
+    totalGain: 0,
+    totalLoss: 0,
+    gainCount: 0,
+    lossCount: 0,
+  };
+
+  // Group trades by ticker
+  const byTicker = {};
+  trades.forEach(t => {
+    if (!byTicker[t.ticker]) byTicker[t.ticker] = [];
+    byTicker[t.ticker].push(t);
+  });
+
+  Object.values(byTicker).forEach(tickerTrades => {
+    const buys = tickerTrades
+      .filter(t => t.direction === 'buy' || t.direction === 'cover')
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    const sells = tickerTrades
+      .filter(t => t.direction === 'sell' || t.direction === 'short')
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+    const pairs = Math.min(buys.length, sells.length);
+    for (let i = 0; i < pairs; i++) {
+      const buy = buys[i];
+      const sell = sells[i];
+      const qty = Math.min(buy.quantity || 0, sell.quantity || 0);
+      const pnl = (sell.price - buy.price) * qty;
+
+      stats.completedTrades++;
+      stats.totalReturnDollar += pnl;
+
+      if (pnl >= 0) {
+        stats.wins++;
+        stats.totalGain += pnl;
+        stats.gainCount++;
+      } else {
+        stats.losses++;
+        stats.totalLoss += pnl;
+        stats.lossCount++;
+      }
+    }
+  });
+
+  return {
+    ...stats,
+    winRate: stats.completedTrades > 0
+      ? ((stats.wins / stats.completedTrades) * 100).toFixed(1)
+      : '0.0',
+    avgGain: stats.gainCount > 0
+      ? (stats.totalGain / stats.gainCount).toFixed(2)
+      : '0.00',
+    avgLoss: stats.lossCount > 0
+      ? (stats.totalLoss / stats.lossCount).toFixed(2)
+      : '0.00',
+  };
+}
+
 function StrategyDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const [strategy, setStrategy] = useState(null);
   const [holdings, setHoldings] = useState([]);
   const [updates, setUpdates] = useState([]);
+  const [trades, setTrades] = useState([]);
   const [subscriberCount, setSubscriberCount] = useState(0);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscriptionLoading, setSubscriptionLoading] = useState(false);
@@ -46,6 +118,19 @@ function StrategyDetail() {
     setHoldings(holdRes.data || []);
     setUpdates(updRes.data || []);
     setSubscriberCount(subCountRes.count || 0);
+
+    // Fetch trades (table may not exist yet)
+    try {
+      const { data: tradeData } = await supabase
+        .from('nc_trades')
+        .select('*')
+        .eq('strategy_id', id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      setTrades(tradeData || []);
+    } catch {
+      setTrades([]);
+    }
 
     if (user) {
       const { data: sub } = await supabase
@@ -123,13 +208,21 @@ function StrategyDetail() {
   }
 
   const isOwner = user?.id === strategy.creator_id;
+  const perfStats = calculatePerformance(trades);
 
   return (
     <div className="strategy-detail">
       <div className="container">
         <div className="strategy-detail-header">
           <div className="strategy-detail-info">
-            <h1>{strategy.title}</h1>
+            <h1>
+              {strategy.title}
+              {strategy.strategy_type && (
+                <span className={`strategy-type-badge strategy-type-${strategy.strategy_type}`} style={{ marginLeft: '12px', verticalAlign: 'middle' }}>
+                  {strategy.strategy_type === 'automated' ? '\uD83E\uDD16 Automated' : '\uD83D\uDC64 Manual'}
+                </span>
+              )}
+            </h1>
             <p className="strategy-detail-creator">
               by {strategy.nc_profiles?.name || 'Unknown Creator'}
             </p>
@@ -141,6 +234,9 @@ function StrategyDetail() {
               )}
               {strategy.asset_class && (
                 <span className="meta-badge">{strategy.asset_class}</span>
+              )}
+              {strategy.benchmark && strategy.benchmark !== 'none' && (
+                <span className="meta-badge">vs {BENCHMARK_LABELS[strategy.benchmark] || strategy.benchmark}</span>
               )}
               <span className="meta-badge">
                 {subscriberCount} subscriber{subscriberCount !== 1 ? 's' : ''}
@@ -188,6 +284,85 @@ function StrategyDetail() {
           <div className="strategy-detail-section">
             <h2>About This Strategy</h2>
             <p>{strategy.description}</p>
+          </div>
+        )}
+
+        {strategy.strategy_type === 'automated' && strategy.rules_description && (
+          <div className="strategy-detail-section">
+            <h2>Strategy Rules</h2>
+            <div className="rules-box">
+              {strategy.rules_description}
+            </div>
+          </div>
+        )}
+
+        {trades.length > 0 && (
+          <div className="strategy-detail-section">
+            <h2>Performance</h2>
+            <div className="performance-stats">
+              <div className="perf-stat-card">
+                <span className="stat-value">{perfStats.totalTrades}</span>
+                <span className="stat-label">Total Trades</span>
+              </div>
+              <div className="perf-stat-card">
+                <span className="stat-value">{perfStats.completedTrades}</span>
+                <span className="stat-label">Completed</span>
+              </div>
+              <div className="perf-stat-card">
+                <span className="stat-value">{perfStats.winRate}%</span>
+                <span className="stat-label">Win Rate</span>
+              </div>
+              <div className="perf-stat-card">
+                <span className={`stat-value ${perfStats.totalReturnDollar >= 0 ? '' : 'text-error'}`}>
+                  ${perfStats.totalReturnDollar.toFixed(2)}
+                </span>
+                <span className="stat-label">Total Return</span>
+              </div>
+              <div className="perf-stat-card">
+                <span className="stat-value" style={{ color: '#10b981' }}>${perfStats.avgGain}</span>
+                <span className="stat-label">Avg Gain</span>
+              </div>
+              <div className="perf-stat-card">
+                <span className="stat-value text-error">${perfStats.avgLoss}</span>
+                <span className="stat-label">Avg Loss</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {trades.length > 0 && (
+          <div className="strategy-detail-section">
+            <h2>Trade History</h2>
+            <div className="portfolio-table-wrapper">
+              <table className="trade-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Direction</th>
+                    <th>Ticker</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Rationale</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {trades.map(trade => (
+                    <tr key={trade.id}>
+                      <td>{new Date(trade.created_at).toLocaleDateString()}</td>
+                      <td>
+                        <span className={`trade-direction trade-direction-${trade.direction}`}>
+                          {trade.direction}
+                        </span>
+                      </td>
+                      <td className="ticker-cell">{trade.ticker}</td>
+                      <td>{trade.quantity}</td>
+                      <td>${Number(trade.price).toFixed(2)}</td>
+                      <td>{trade.rationale || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 

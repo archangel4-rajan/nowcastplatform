@@ -1662,3 +1662,135 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ─── Strategy Type Badges ─────────────────────────────────────────────── */
+
+.strategy-type-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.strategy-type-automated {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.strategy-type-manual {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* ─── Rules Box ────────────────────────────────────────────────────────── */
+
+.rules-box {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px 24px;
+  font-family: 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-color);
+  white-space: pre-wrap;
+}
+
+/* ─── Trade Table ──────────────────────────────────────────────────────── */
+
+.trade-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.trade-table th {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--border-color);
+  font-weight: 600;
+  color: var(--light-text);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.trade-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.trade-table tr:hover {
+  background: var(--light-background);
+}
+
+/* ─── Trade Direction Badges ───────────────────────────────────────────── */
+
+.trade-direction {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.trade-direction-buy {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.trade-direction-sell {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.trade-direction-short {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.trade-direction-cover {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* ─── Performance Stats ────────────────────────────────────────────────── */
+
+.performance-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.perf-stat-card {
+  background: var(--light-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.perf-stat-card .stat-value {
+  font-size: 24px;
+}
+
+.perf-stat-card .stat-label {
+  font-size: 13px;
+}
+
+/* ─── Trade Log Form ───────────────────────────────────────────────────── */
+
+.trade-log-form {
+  background: var(--light-background);
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.trade-log-form .form-group textarea {
+  min-height: 80px;
+}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { STRATEGY_TAGS, RISK_LEVELS, ASSET_CLASSES } from '../constants/tags';
+import { STRATEGY_TAGS, RISK_LEVELS, ASSET_CLASSES, STRATEGY_TYPES, BENCHMARKS } from '../constants/tags';
 import TagBadge from '../components/TagBadge';
 
 function CreateStrategy() {
@@ -18,6 +18,9 @@ function CreateStrategy() {
     subscription_price: 0,
     risk_level: 'medium',
     asset_class: 'equities',
+    strategy_type: 'manual',
+    rules_description: '',
+    benchmark: 'none',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -50,6 +53,9 @@ function CreateStrategy() {
       subscription_price: data.subscription_price || 0,
       risk_level: data.risk_level || 'medium',
       asset_class: data.asset_class || 'equities',
+      strategy_type: data.strategy_type || 'manual',
+      rules_description: data.rules_description || '',
+      benchmark: data.benchmark || 'none',
     });
     setLoading(false);
   }
@@ -81,6 +87,9 @@ function CreateStrategy() {
       subscription_price: Number(form.subscription_price) || 0,
       risk_level: form.risk_level,
       asset_class: form.asset_class,
+      strategy_type: form.strategy_type,
+      rules_description: form.strategy_type === 'automated' ? form.rules_description.trim() : null,
+      benchmark: form.benchmark,
       status: status || 'draft',
     };
 
@@ -164,6 +173,51 @@ function CreateStrategy() {
                 ))}
               </div>
             </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="strategy_type">Strategy Type</label>
+                <select
+                  id="strategy_type"
+                  value={form.strategy_type}
+                  onChange={e => setForm({ ...form, strategy_type: e.target.value })}
+                >
+                  {STRATEGY_TYPES.map(t => (
+                    <option key={t} value={t}>
+                      {t === 'automated' ? 'Automated (rule-based algo)' : 'Manual (creator trades)'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="benchmark">Benchmark</label>
+                <select
+                  id="benchmark"
+                  value={form.benchmark}
+                  onChange={e => setForm({ ...form, benchmark: e.target.value })}
+                >
+                  {BENCHMARKS.map(b => (
+                    <option key={b} value={b}>
+                      {b === 'none' ? 'None' : b === 'sp500' ? 'S&P 500' : b === 'btc' ? 'Bitcoin' : 'Ethereum'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {form.strategy_type === 'automated' && (
+              <div className="form-group">
+                <label htmlFor="rules_description">Rules Description</label>
+                <textarea
+                  id="rules_description"
+                  value={form.rules_description}
+                  onChange={e => setForm({ ...form, rules_description: e.target.value })}
+                  placeholder="Describe the rules that govern this automated strategy..."
+                  rows={5}
+                />
+              </div>
+            )}
 
             <div className="form-row">
               <div className="form-group">

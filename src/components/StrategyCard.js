@@ -13,7 +13,14 @@ function StrategyCard({ strategy, subscriberCount }) {
     <Link to={`/strategy/${strategy.id}`} className="strategy-card-link">
       <div className="strategy-card">
         <div className="strategy-card-header">
-          <h3 className="strategy-card-title">{strategy.title}</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h3 className="strategy-card-title">{strategy.title}</h3>
+            {strategy.strategy_type && (
+              <span className={`strategy-type-badge strategy-type-${strategy.strategy_type}`}>
+                {strategy.strategy_type === 'automated' ? '\uD83E\uDD16 Auto' : '\uD83D\uDC64 Manual'}
+              </span>
+            )}
+          </div>
           {strategy.risk_level && (
             <span className={`risk-badge ${riskColors[strategy.risk_level]}`}>
               {strategy.risk_level}

@@ -183,6 +183,11 @@ function CreatorDashboard() {
                     <div className="creator-strategy-info">
                       <Link to={`/strategy/${strategy.id}`} className="creator-strategy-title">
                         {strategy.title}
+                        {strategy.strategy_type && (
+                          <span className={`strategy-type-badge strategy-type-${strategy.strategy_type}`} style={{ marginLeft: '8px' }}>
+                            {strategy.strategy_type === 'automated' ? '\uD83E\uDD16 Auto' : '\uD83D\uDC64 Manual'}
+                          </span>
+                        )}
                       </Link>
                       <div className="creator-strategy-meta">
                         <span className={`status-badge status-${strategy.status}`}>
