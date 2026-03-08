@@ -24,6 +24,20 @@ import App from './App';
 
 // ─── Mocks ─────────────────────────────────────────────────────────────────
 
+const mockEq = () => ({
+  single: () => Promise.resolve({ data: null }),
+  order: () => ({ limit: () => Promise.resolve({ data: [] }) }),
+  in: () => Promise.resolve({ data: [] }),
+  eq: () => ({
+    single: () => Promise.resolve({ data: null }),
+    order: () => ({ limit: () => Promise.resolve({ data: [] }) }),
+    eq: () => ({
+      single: () => Promise.resolve({ data: null }),
+      order: () => ({ limit: () => Promise.resolve({ data: [] }) }),
+    }),
+  }),
+});
+
 jest.mock('./lib/supabase', () => ({
   supabase: {
     auth: {
@@ -37,18 +51,26 @@ jest.mock('./lib/supabase', () => ({
     },
     from: () => ({
       select: () => ({
-        eq: () => ({
-          single: () => Promise.resolve({ data: null }),
-          order: () => Promise.resolve({ data: [] }),
-          in: () => Promise.resolve({ data: [] }),
-        }),
+        eq: mockEq,
         order: () => ({
           eq: () => Promise.resolve({ data: [] }),
         }),
         in: () => Promise.resolve({ data: [] }),
       }),
+      insert: () => ({ select: () => ({ single: () => Promise.resolve({ data: null }) }) }),
+      update: () => ({ eq: () => ({ select: () => ({ single: () => Promise.resolve({ data: null }) }) }) }),
     }),
+    rpc: () => Promise.resolve({ data: null }),
   },
+}));
+
+jest.mock('./lib/priceService', () => ({
+  fetchBTCPrice: () => Promise.resolve(null),
+  clearPriceCache: jest.fn(),
+}));
+
+jest.mock('./lib/strategySimulator', () => ({
+  checkAndExecuteTrade: () => Promise.resolve(null),
 }));
 
 // ─── Helpers ───────────────────────────────────────────────────────────────

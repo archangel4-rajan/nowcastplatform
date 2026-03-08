@@ -4,9 +4,10 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
 function Dashboard() {
-  const { user, profile } = useAuth();
+  const { user, profile, wallet } = useAuth();
   const [subscriptions, setSubscriptions] = useState([]);
   const [recentUpdates, setRecentUpdates] = useState([]);
+  const [deployments, setDeployments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,6 +36,18 @@ function Dashboard() {
       setRecentUpdates(updates || []);
     }
 
+    // Fetch active deployments
+    try {
+      const { data: deps } = await supabase
+        .from('nc_deployments')
+        .select('*, nc_strategies(title)')
+        .eq('user_id', user.id)
+        .eq('status', 'active');
+      setDeployments(deps || []);
+    } catch {
+      // Table may not exist yet
+    }
+
     setLoading(false);
   }
 
@@ -59,6 +72,23 @@ function Dashboard() {
         </div>
 
         <div className="dashboard-grid">
+          {wallet && (
+            <div className="dashboard-card">
+              <h3>Wallet</h3>
+              <div className="wallet-balance" style={{ fontSize: '28px' }}>
+                ${Number(wallet.balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              {deployments.length > 0 && (
+                <p style={{ color: 'var(--light-text)', fontSize: '14px', marginTop: '8px' }}>
+                  {deployments.length} active deployment{deployments.length !== 1 ? 's' : ''}
+                </p>
+              )}
+              <Link to="/wallet" className="btn btn-primary btn-sm" style={{ marginTop: '12px' }}>
+                Manage Wallet
+              </Link>
+            </div>
+          )}
+
           <div className="dashboard-card">
             <h3>Profile</h3>
             <div className="profile-info">

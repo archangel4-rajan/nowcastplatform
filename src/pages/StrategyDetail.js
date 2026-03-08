@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { fetchBTCPrice } from '../lib/priceService';
+import { checkAndExecuteTrade } from '../lib/strategySimulator';
 import PortfolioTable from '../components/PortfolioTable';
 import CommentSection from '../components/CommentSection';
 import TagBadge from '../components/TagBadge';
@@ -79,7 +81,7 @@ function calculatePerformance(trades) {
 
 function StrategyDetail() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, wallet, refreshWallet } = useAuth();
   const [strategy, setStrategy] = useState(null);
   const [holdings, setHoldings] = useState([]);
   const [updates, setUpdates] = useState([]);
@@ -88,6 +90,18 @@ function StrategyDetail() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscriptionLoading, setSubscriptionLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Live price state
+  const [btcPrice, setBtcPrice] = useState(null);
+  const [priceDirection, setPriceDirection] = useState(null);
+  const prevPriceRef = useRef(null);
+
+  // Deploy capital state
+  const [showDeploy, setShowDeploy] = useState(false);
+  const [deployAmount, setDeployAmount] = useState('');
+  const [deployLoading, setDeployLoading] = useState(false);
+  const [userDeployment, setUserDeployment] = useState(null);
+  const [notification, setNotification] = useState(null);
 
   const fetchData = useCallback(async () => {
     const [stratRes, holdRes, updRes, subCountRes] = await Promise.all([
@@ -140,6 +154,20 @@ function StrategyDetail() {
         .eq('strategy_id', id)
         .single();
       setIsSubscribed(sub?.status === 'active');
+
+      // Fetch user's active deployment for this strategy
+      try {
+        const { data: dep } = await supabase
+          .from('nc_deployments')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('strategy_id', id)
+          .eq('status', 'active')
+          .single();
+        setUserDeployment(dep);
+      } catch {
+        setUserDeployment(null);
+      }
     }
 
     setLoading(false);
@@ -148,6 +176,40 @@ function StrategyDetail() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Live BTC price polling for crypto strategies
+  useEffect(() => {
+    if (!strategy || strategy.asset_class !== 'crypto') return;
+
+    let interval;
+    const pollPrice = async () => {
+      const price = await fetchBTCPrice();
+      if (price) {
+        setBtcPrice(prev => {
+          if (prev !== null) {
+            setPriceDirection(price > prev ? 'up' : price < prev ? 'down' : null);
+          }
+          prevPriceRef.current = prev;
+          return price;
+        });
+
+        // Run simulator if strategy is automated
+        if (strategy.strategy_type === 'automated' && strategy.current_position !== 'none') {
+          const result = await checkAndExecuteTrade(strategy, price, supabase);
+          if (result?.executed) {
+            // Refresh data to show new trade
+            fetchData();
+          }
+        }
+      }
+    };
+
+    pollPrice();
+    interval = setInterval(pollPrice, 30000);
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [strategy?.id, strategy?.asset_class, strategy?.strategy_type, strategy?.current_position]);
 
   async function handleSubscribe() {
     if (!user) return;
@@ -192,6 +254,57 @@ function StrategyDetail() {
     setSubscriptionLoading(false);
   }
 
+  async function handleDeploy(e) {
+    e.preventDefault();
+    const amount = parseFloat(deployAmount);
+    if (!amount || amount <= 0 || !user) return;
+
+    setDeployLoading(true);
+    try {
+      const { data } = await supabase.rpc('nc_deploy_capital', {
+        p_user_id: user.id,
+        p_strategy_id: id,
+        p_amount: amount,
+      });
+
+      if (data?.error) {
+        setNotification({ type: 'error', message: data.error });
+      } else {
+        setNotification({ type: 'success', message: `Deployed $${amount.toFixed(2)} successfully` });
+        setDeployAmount('');
+        setShowDeploy(false);
+        await refreshWallet();
+        await fetchData();
+      }
+    } catch {
+      setNotification({ type: 'error', message: 'Deploy failed' });
+    }
+    setDeployLoading(false);
+  }
+
+  async function handleWithdrawDeployment() {
+    if (!userDeployment) return;
+    setDeployLoading(true);
+    try {
+      const { data } = await supabase.rpc('nc_withdraw_capital', {
+        p_user_id: user.id,
+        p_deployment_id: userDeployment.id,
+      });
+
+      if (data?.error) {
+        setNotification({ type: 'error', message: data.error });
+      } else {
+        setNotification({ type: 'success', message: `Withdrawn $${data.returned?.toFixed(2)}` });
+        setUserDeployment(null);
+        await refreshWallet();
+        await fetchData();
+      }
+    } catch {
+      setNotification({ type: 'error', message: 'Withdrawal failed' });
+    }
+    setDeployLoading(false);
+  }
+
   if (loading) {
     return <div className="container"><div className="loading">Loading strategy...</div></div>;
   }
@@ -209,10 +322,26 @@ function StrategyDetail() {
 
   const isOwner = user?.id === strategy.creator_id;
   const perfStats = calculatePerformance(trades);
+  const isCryptoStrategy = strategy.asset_class === 'crypto';
+  const isAutomated = strategy.strategy_type === 'automated';
+
+  // Calculate unrealized P&L for simulation
+  let unrealizedPnl = null;
+  let unrealizedPnlPct = null;
+  if (isAutomated && strategy.current_position === 'holding' && btcPrice && strategy.position_entry_price) {
+    unrealizedPnl = btcPrice - Number(strategy.position_entry_price);
+    unrealizedPnlPct = (unrealizedPnl / Number(strategy.position_entry_price)) * 100;
+  }
 
   return (
     <div className="strategy-detail">
       <div className="container">
+        {notification && (
+          <div className={`notification ${notification.type}`}>
+            {notification.message}
+          </div>
+        )}
+
         <div className="strategy-detail-header">
           <div className="strategy-detail-info">
             <h1>
@@ -272,6 +401,15 @@ function StrategyDetail() {
                 </button>
               )
             )}
+            {user && !isOwner && !userDeployment && (
+              <button
+                className="btn btn-primary"
+                onClick={() => setShowDeploy(!showDeploy)}
+                style={{ marginLeft: '8px' }}
+              >
+                Deploy Capital
+              </button>
+            )}
             {isOwner && (
               <Link to={`/creator/edit/${strategy.id}`} className="btn btn-secondary">
                 Edit Strategy
@@ -279,6 +417,122 @@ function StrategyDetail() {
             )}
           </div>
         </div>
+
+        {/* Deploy Capital Form */}
+        {showDeploy && user && !isOwner && (
+          <div className="strategy-detail-section">
+            <div className="deploy-form">
+              <h3>Deploy Capital</h3>
+              <p style={{ color: 'var(--light-text)', marginBottom: '12px' }}>
+                Wallet balance: ${wallet ? Number(wallet.balance).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00'}
+              </p>
+              <form onSubmit={handleDeploy}>
+                <div className="form-group">
+                  <label>Amount ($)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    max={wallet?.balance || 0}
+                    value={deployAmount}
+                    onChange={(e) => setDeployAmount(e.target.value)}
+                    placeholder="Enter amount to deploy"
+                    required
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button className="btn btn-primary btn-sm" disabled={deployLoading} type="submit">
+                    {deployLoading ? 'Deploying...' : 'Deploy'}
+                  </button>
+                  <button className="btn btn-secondary btn-sm" type="button" onClick={() => setShowDeploy(false)}>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Active Deployment */}
+        {userDeployment && (
+          <div className="strategy-detail-section">
+            <div className="deployment-card" style={{ padding: '20px' }}>
+              <h3 style={{ marginBottom: '12px' }}>Your Deployment</h3>
+              <div className="deployment-details" style={{ marginBottom: '12px' }}>
+                <span>Deployed: ${Number(userDeployment.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                <span>Current Value: ${Number(userDeployment.current_value).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                {(() => {
+                  const gl = Number(userDeployment.current_value) - Number(userDeployment.amount);
+                  const glPct = ((gl / Number(userDeployment.amount)) * 100).toFixed(2);
+                  return (
+                    <span className={gl >= 0 ? 'deployment-gain' : 'deployment-loss'}>
+                      {gl >= 0 ? '+' : ''}{glPct}%
+                    </span>
+                  );
+                })()}
+              </div>
+              <button
+                className="btn btn-warning btn-sm"
+                onClick={handleWithdrawDeployment}
+                disabled={deployLoading}
+              >
+                {deployLoading ? 'Processing...' : 'Withdraw Capital'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Live BTC Price */}
+        {isCryptoStrategy && btcPrice && (
+          <div className="strategy-detail-section">
+            <h2>Live Price</h2>
+            <div className="live-price">
+              <span className="live-price-dot"></span>
+              <span className={`live-price-value ${priceDirection === 'up' ? 'price-up' : priceDirection === 'down' ? 'price-down' : ''}`}>
+                BTC ${btcPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Simulation Status */}
+        {isAutomated && strategy.current_position !== 'none' && (
+          <div className="strategy-detail-section">
+            <h2>Simulation Status</h2>
+            <div className="simulation-status">
+              <div className="performance-stats">
+                <div className="perf-stat-card">
+                  <span className="stat-value">
+                    {strategy.current_position === 'holding' ? 'Holding BTC' : 'In USDC'}
+                  </span>
+                  <span className="stat-label">Current Position</span>
+                </div>
+                {strategy.position_entry_price && strategy.current_position === 'holding' && (
+                  <div className="perf-stat-card">
+                    <span className="stat-value">
+                      ${Number(strategy.position_entry_price).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </span>
+                    <span className="stat-label">Entry Price</span>
+                  </div>
+                )}
+                {unrealizedPnl !== null && (
+                  <div className="perf-stat-card">
+                    <span className={`stat-value ${unrealizedPnl >= 0 ? '' : 'text-error'}`}>
+                      {unrealizedPnl >= 0 ? '+' : ''}{unrealizedPnlPct.toFixed(2)}%
+                    </span>
+                    <span className="stat-label">Unrealized P&L</span>
+                  </div>
+                )}
+                <div className="perf-stat-card">
+                  <span className="stat-value">
+                    ${Number(strategy.simulation_capital).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </span>
+                  <span className="stat-label">Simulation Capital</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {strategy.description && (
           <div className="strategy-detail-section">
@@ -357,7 +611,7 @@ function StrategyDetail() {
                       <td className="ticker-cell">{trade.ticker}</td>
                       <td>{trade.quantity}</td>
                       <td>${Number(trade.price).toFixed(2)}</td>
-                      <td>{trade.rationale || '—'}</td>
+                      <td>{trade.rationale || '\u2014'}</td>
                     </tr>
                   ))}
                 </tbody>

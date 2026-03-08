@@ -27,6 +27,7 @@ function Navbar() {
           {user ? (
             <>
               <Link to="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+              <Link to="/wallet" onClick={() => setMenuOpen(false)}>Wallet</Link>
               {profile?.role === 'creator' && (
                 <Link to="/creator" onClick={() => setMenuOpen(false)}>Creator Studio</Link>
               )}

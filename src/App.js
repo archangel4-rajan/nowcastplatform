@@ -16,6 +16,7 @@ import StrategyDetail from './pages/StrategyDetail';
 import CreatorDashboard from './pages/CreatorDashboard';
 import CreateStrategy from './pages/CreateStrategy';
 import ManagePortfolio from './pages/ManagePortfolio';
+import Wallet from './pages/Wallet';
 import './App.css';
 
 function HomeRoute() {
@@ -47,6 +48,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/wallet"
+                element={
+                  <ProtectedRoute>
+                    <Wallet />
                   </ProtectedRoute>
                 }
               />

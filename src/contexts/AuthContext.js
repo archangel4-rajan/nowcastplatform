@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext(null);
@@ -6,13 +6,45 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchWallet = useCallback(async (userId) => {
+    try {
+      let { data } = await supabase
+        .from('nc_wallets')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (!data) {
+        // Auto-create wallet with $0 balance
+        const { data: newWallet } = await supabase
+          .from('nc_wallets')
+          .insert({ user_id: userId, balance: 0 })
+          .select()
+          .single();
+        data = newWallet;
+      }
+
+      if (data) setWallet(data);
+    } catch {
+      // Table may not exist yet
+    }
+  }, []);
+
+  const refreshWallet = useCallback(async () => {
+    if (user) {
+      await fetchWallet(user.id);
+    }
+  }, [user, fetchWallet]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user);
         fetchProfile(session.user.id);
+        fetchWallet(session.user.id);
       }
       setLoading(false);
     });
@@ -21,14 +53,16 @@ export function AuthProvider({ children }) {
       if (session?.user) {
         setUser(session.user);
         fetchProfile(session.user.id);
+        fetchWallet(session.user.id);
       } else {
         setUser(null);
         setProfile(null);
+        setWallet(null);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [fetchWallet]);
 
   async function fetchProfile(userId) {
     const { data } = await supabase
@@ -61,6 +95,7 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    setWallet(null);
   }
 
   async function updateProfile(updates) {
@@ -79,12 +114,14 @@ export function AuthProvider({ children }) {
   const value = {
     user,
     profile,
+    wallet,
     loading,
     signInWithEmail,
     signUpWithEmail,
     signOut,
     updateProfile,
     fetchProfile,
+    refreshWallet,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
