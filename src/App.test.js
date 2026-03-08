@@ -1,8 +1,407 @@
-import { render, screen } from '@testing-library/react';
+/**
+ * NowCast Platform — Comprehensive React App Tests
+ *
+ * Validates:
+ *   - All pages render without crashing
+ *   - Marketplace concept content (no old fintech copy)
+ *   - Navigation links present
+ *   - Footer consistency
+ *   - Contact form fields and validation
+ *   - Pricing tiers and content accuracy
+ *   - About page values and team
+ *   - Accessibility basics
+ */
+
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import App from './App';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+// Mock Amplify to avoid config errors in test
+jest.mock('@aws-amplify/core', () => ({
+  Amplify: { configure: jest.fn() },
+}));
+
+// Helper: render the full app (it has its own BrowserRouter)
+function renderApp() {
+  return render(<App />);
+}
+
+// Helper: navigate by clicking a nav link
+function navigateTo(linkText) {
+  const links = screen.getAllByText(linkText);
+  // Click the nav link (first match in nav area)
+  const navLink = links.find(el => el.closest('.nav-links') || el.closest('.footer'));
+  if (navLink) {
+    fireEvent.click(navLink);
+  }
+}
+
+// ─── Landing Page ──────────────────────────────────────────────────────────
+
+describe('Landing Page', () => {
+  beforeEach(() => renderApp());
+
+  test('renders hero headline', () => {
+    expect(screen.getByText('Trade Smarter with Proven Strategies')).toBeInTheDocument();
+  });
+
+  test('renders hero subtitle with marketplace description', () => {
+    expect(screen.getByText(/marketplace where top strategy creators/i)).toBeInTheDocument();
+  });
+
+  test('renders Browse Strategies CTA', () => {
+    expect(screen.getByText('Browse Strategies')).toBeInTheDocument();
+  });
+
+  test('renders Become a Creator CTA', () => {
+    expect(screen.getByText('Become a Creator')).toBeInTheDocument();
+  });
+
+  test('renders Why NowCast section', () => {
+    expect(screen.getByText('Why NowCast?')).toBeInTheDocument();
+    expect(screen.getByText('Curated Strategies')).toBeInTheDocument();
+    expect(screen.getByText('Transparent Performance')).toBeInTheDocument();
+    expect(screen.getByText('Equities & Crypto')).toBeInTheDocument();
+  });
+
+  test('renders How It Works section', () => {
+    expect(screen.getByText('How It Works')).toBeInTheDocument();
+    expect(screen.getByText('Discover')).toBeInTheDocument();
+    expect(screen.getByText('Subscribe')).toBeInTheDocument();
+    expect(screen.getByText('Profit')).toBeInTheDocument();
+  });
+
+  test('renders two-sided marketplace section', () => {
+    expect(screen.getByText('Built for Two Sides of the Market')).toBeInTheDocument();
+    expect(screen.getByText('Strategy Creators')).toBeInTheDocument();
+    expect(screen.getByText('Subscribers')).toBeInTheDocument();
+    expect(screen.getByText('Trust & Transparency')).toBeInTheDocument();
+  });
+
+  test('renders CTA section with sign-in', () => {
+    expect(screen.getByText('Ready to trade smarter?')).toBeInTheDocument();
+    expect(screen.getByText('Get Started with Google')).toBeInTheDocument();
+  });
+
+  test('does NOT contain old fintech copy', () => {
+    const body = document.body.textContent;
+    expect(body).not.toContain('Your Money Visible');
+    expect(body).not.toContain('Simplify Your Money');
+    expect(body).not.toContain('5 watchlists');
+  });
+});
+
+// ─── Navigation ────────────────────────────────────────────────────────────
+
+describe('Navigation', () => {
+  beforeEach(() => renderApp());
+
+  test('has Features link', () => {
+    const links = screen.getAllByText('Features');
+    expect(links.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test('has Solutions link', () => {
+    const links = screen.getAllByText('Solutions');
+    expect(links.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test('has Pricing link', () => {
+    const links = screen.getAllByText('Pricing');
+    expect(links.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test('has About link', () => {
+    const links = screen.getAllByText('About');
+    expect(links.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test('has Sign In button when not authenticated', () => {
+    expect(screen.getByText('Sign In')).toBeInTheDocument();
+  });
+
+  test('has mobile menu button with aria-label', () => {
+    expect(screen.getByLabelText('Toggle menu')).toBeInTheDocument();
+  });
+
+  test('mobile menu toggles on click', () => {
+    const menuBtn = screen.getByLabelText('Toggle menu');
+    fireEvent.click(menuBtn);
+    const navLinks = document.querySelector('.nav-links');
+    expect(navLinks.classList.contains('active')).toBe(true);
+
+    // Toggle back
+    fireEvent.click(menuBtn);
+    expect(navLinks.classList.contains('active')).toBe(false);
+  });
+});
+
+// ─── Footer ────────────────────────────────────────────────────────────────
+
+describe('Footer', () => {
+  beforeEach(() => renderApp());
+
+  test('describes marketplace concept', () => {
+    expect(screen.getByText(/marketplace for trading and investment strategies/i)).toBeInTheDocument();
+  });
+
+  test('has contact info', () => {
+    expect(screen.getByText('info@nowcast.com')).toBeInTheDocument();
+    expect(screen.getByText('(585) 910-9581')).toBeInTheDocument();
+  });
+
+  test('has copyright with current year', () => {
+    const year = new Date().getFullYear();
+    expect(screen.getByText(new RegExp(`${year} NowCast`))).toBeInTheDocument();
+  });
+
+  test('has Product and Company sections', () => {
+    expect(screen.getByText('Product')).toBeInTheDocument();
+    expect(screen.getByText('Company')).toBeInTheDocument();
+  });
+});
+
+// ─── Features Page (via navigation) ───────────────────────────────────────
+
+describe('Features Page', () => {
+  beforeEach(() => {
+    renderApp();
+    navigateTo('Features');
+  });
+
+  test('renders page title', () => {
+    expect(screen.getByText('Platform Features')).toBeInTheDocument();
+  });
+
+  test('has For Strategy Creators section', () => {
+    expect(screen.getByText('For Strategy Creators')).toBeInTheDocument();
+  });
+
+  test('has For Subscribers section', () => {
+    expect(screen.getByText('For Subscribers')).toBeInTheDocument();
+  });
+
+  test('has Platform-Wide section', () => {
+    expect(screen.getByText('Platform-Wide')).toBeInTheDocument();
+  });
+
+  test('mentions key features', () => {
+    expect(screen.getByText('Strategy Builder')).toBeInTheDocument();
+    expect(screen.getByText('Backtesting Engine')).toBeInTheDocument();
+    expect(screen.getByText('Creator Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Real-time Trade Signals')).toBeInTheDocument();
+    expect(screen.getByText('Performance Analytics')).toBeInTheDocument();
+    expect(screen.getByText('Portfolio View')).toBeInTheDocument();
+    expect(screen.getByText('Verified Track Records')).toBeInTheDocument();
+    expect(screen.getByText('Risk Management Tools')).toBeInTheDocument();
+    expect(screen.getByText('Marketplace Search & Filters')).toBeInTheDocument();
+  });
+});
+
+// ─── Solutions Page ────────────────────────────────────────────────────────
+
+describe('Solutions Page', () => {
+  beforeEach(() => {
+    renderApp();
+    navigateTo('Solutions');
+  });
+
+  test('has creator section with monetization', () => {
+    expect(screen.getByText('Monetize Your Expertise')).toBeInTheDocument();
+    expect(screen.getByText('Build Your Reputation')).toBeInTheDocument();
+    expect(screen.getByText('Focus on Alpha')).toBeInTheDocument();
+  });
+
+  test('has subscriber section', () => {
+    expect(screen.getByText('Access Proven Strategies')).toBeInTheDocument();
+    expect(screen.getByText('Diversify Your Approach')).toBeInTheDocument();
+    expect(screen.getByText('Trade with Confidence')).toBeInTheDocument();
+  });
+
+  test('has supported markets', () => {
+    expect(screen.getByText('Supported Markets')).toBeInTheDocument();
+    expect(screen.getByText('Equities')).toBeInTheDocument();
+    expect(screen.getByText('Cryptocurrency')).toBeInTheDocument();
+    expect(screen.getByText('Multi-Asset')).toBeInTheDocument();
+  });
+
+  test('mentions 80% revenue share', () => {
+    expect(screen.getByText(/80%/)).toBeInTheDocument();
+  });
+
+  test('has CTA', () => {
+    expect(screen.getByText('Ready to Get Started?')).toBeInTheDocument();
+  });
+});
+
+// ─── Pricing Page ──────────────────────────────────────────────────────────
+
+describe('Pricing Page', () => {
+  beforeEach(() => {
+    renderApp();
+    navigateTo('Pricing');
+  });
+
+  test('has subscriber tiers', () => {
+    expect(screen.getByText('Explorer')).toBeInTheDocument();
+    expect(screen.getByText('Trader')).toBeInTheDocument();
+    expect(screen.getByText('Trader Pro')).toBeInTheDocument();
+  });
+
+  test('has correct prices', () => {
+    expect(screen.getByText(/\$29/)).toBeInTheDocument();
+    expect(screen.getByText(/\$79/)).toBeInTheDocument();
+  });
+
+  test('has Most Popular badge', () => {
+    expect(screen.getByText('Most Popular')).toBeInTheDocument();
+  });
+
+  test('has Creator tier', () => {
+    // "Creator" appears in multiple contexts — check for the pricing-specific one
+    const creatorHeadings = screen.getAllByText('Creator');
+    expect(creatorHeadings.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Free to publish/).length).toBeGreaterThanOrEqual(1);
+  });
+
+  test('has revenue split info', () => {
+    expect(screen.getByText(/80%/)).toBeInTheDocument();
+    expect(screen.getByText(/20%/)).toBeInTheDocument();
+  });
+
+  test('has revenue example', () => {
+    expect(screen.getByText(/\$4,000/)).toBeInTheDocument();
+  });
+
+  test('has FAQ', () => {
+    expect(screen.getByText('Frequently Asked Questions')).toBeInTheDocument();
+    expect(screen.getByText(/Can I cancel anytime/i)).toBeInTheDocument();
+  });
+});
+
+// ─── About Page ────────────────────────────────────────────────────────────
+
+describe('About Page', () => {
+  beforeEach(() => {
+    renderApp();
+    navigateTo('About');
+  });
+
+  test('has mission section', () => {
+    expect(screen.getByText('Our Mission')).toBeInTheDocument();
+  });
+
+  test('has Rajan Anand and LinkedIn', () => {
+    expect(screen.getByText('Rajan Anand')).toBeInTheDocument();
+    expect(screen.getByText(/Founder.*CEO/)).toBeInTheDocument();
+    const linkedIn = screen.getByText('LinkedIn');
+    expect(linkedIn).toHaveAttribute('href', 'https://www.linkedin.com/in/rajan-anand/');
+  });
+
+  test('has values', () => {
+    expect(screen.getByText('Our Values')).toBeInTheDocument();
+    expect(screen.getByText('Transparency')).toBeInTheDocument();
+    expect(screen.getByText('Meritocracy')).toBeInTheDocument();
+  });
+
+  test('has CTA', () => {
+    expect(screen.getByText('Join the Marketplace')).toBeInTheDocument();
+  });
+});
+
+// ─── Contact Page ──────────────────────────────────────────────────────────
+
+describe('Contact Page', () => {
+  beforeEach(() => {
+    renderApp();
+    navigateTo('Contact');
+  });
+
+  test('renders page title', () => {
+    expect(screen.getByText('Get in Touch')).toBeInTheDocument();
+  });
+
+  test('has inquiry type dropdown', () => {
+    const select = screen.getByLabelText(/interested in/i);
+    expect(select).toBeInTheDocument();
+    const options = select.querySelectorAll('option');
+    expect(options.length).toBe(4);
+  });
+
+  test('has required name field', () => {
+    expect(screen.getByLabelText('Name')).toBeRequired();
+  });
+
+  test('has required email field', () => {
+    expect(screen.getByLabelText('Email')).toBeRequired();
+  });
+
+  test('has optional company field', () => {
+    expect(screen.getByLabelText(/Company/)).not.toBeRequired();
+  });
+
+  test('has required message field', () => {
+    expect(screen.getByLabelText('Message')).toBeRequired();
+  });
+
+  test('has submit button', () => {
+    expect(screen.getByText('Send Message')).toBeInTheDocument();
+  });
+
+  test('form fields are interactive', () => {
+    const nameInput = screen.getByLabelText('Name');
+    fireEvent.change(nameInput, { target: { value: 'Test User' } });
+    expect(nameInput.value).toBe('Test User');
+
+    const emailInput = screen.getByLabelText('Email');
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    expect(emailInput.value).toBe('test@example.com');
+  });
+});
+
+// ─── Dashboard (Auth-Gated) ───────────────────────────────────────────────
+
+describe('Dashboard', () => {
+  test('does not show dashboard content when not authenticated', () => {
+    renderApp();
+    // Try to navigate to dashboard
+    window.history.pushState({}, '', '/dashboard');
+    // Dashboard should redirect, so "Your strategy dashboard" shouldn't appear
+    expect(screen.queryByText('Your strategy dashboard')).not.toBeInTheDocument();
+  });
+});
+
+// ─── Old Concept Removal ──────────────────────────────────────────────────
+
+describe('Old concept removal', () => {
+  const pagesToCheck = [
+    { name: 'Landing', nav: null },
+    { name: 'Features', nav: 'Features' },
+    { name: 'Pricing', nav: 'Pricing' },
+    { name: 'About', nav: 'About' },
+  ];
+
+  const oldTerms = [
+    'Your Money Visible',
+    'Simplify Your Money',
+    'financial analytics platform',
+    '5 watchlists',
+    'Contact Sales',
+  ];
+
+  pagesToCheck.forEach(({ name, nav }) => {
+    describe(name, () => {
+      beforeEach(() => {
+        renderApp();
+        if (nav) navigateTo(nav);
+      });
+
+      oldTerms.forEach(term => {
+        test(`does not contain "${term}"`, () => {
+          expect(document.body.textContent).not.toContain(term);
+        });
+      });
+    });
+  });
 });
