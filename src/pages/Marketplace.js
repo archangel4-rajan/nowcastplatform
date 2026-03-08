@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import StrategyCard from '../components/StrategyCard';
 import TagBadge from '../components/TagBadge';
 import { STRATEGY_TAGS, RISK_LEVELS, ASSET_CLASSES } from '../constants/tags';
 
 function Marketplace() {
+  const { user } = useAuth();
   const [strategies, setStrategies] = useState([]);
   const [subscriberCounts, setSubscriberCounts] = useState({});
   const [loading, setLoading] = useState(true);
@@ -68,12 +70,20 @@ function Marketplace() {
 
   return (
     <div className="page">
-      <div className="page-hero">
-        <div className="container">
-          <h1>Strategy Marketplace</h1>
-          <p className="page-subtitle">Browse proven trading strategies from top creators. Subscribe and start trading.</p>
+      {user ? (
+        <div className="marketplace-header-compact">
+          <div className="container">
+            <h1>Strategies</h1>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="page-hero">
+          <div className="container">
+            <h1>Strategy Marketplace</h1>
+            <p className="page-subtitle">Browse proven trading strategies from top creators. Subscribe and start trading.</p>
+          </div>
+        </div>
+      )}
 
       <section className="section">
         <div className="container">

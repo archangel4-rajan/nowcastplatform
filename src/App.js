@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -18,6 +18,14 @@ import CreateStrategy from './pages/CreateStrategy';
 import ManagePortfolio from './pages/ManagePortfolio';
 import './App.css';
 
+function HomeRoute() {
+  const { user, profile } = useAuth();
+  if (user) {
+    return <Navigate to={profile?.role === 'creator' ? '/creator' : '/dashboard'} replace />;
+  }
+  return <Landing />;
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -26,7 +34,7 @@ function App() {
           <Navbar />
           <main className="main-content">
             <Routes>
-              <Route path="/" element={<Landing />} />
+              <Route path="/" element={<HomeRoute />} />
               <Route path="/features" element={<Features />} />
 
               <Route path="/about" element={<About />} />

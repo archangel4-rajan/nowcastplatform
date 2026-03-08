@@ -116,6 +116,58 @@ body {
   padding: 8px;
 }
 
+/* ─── Nav User ─────────────────────────────────────────────────────────── */
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-user-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+/* ─── Compact Footer (logged in) ───────────────────────────────────────── */
+
+.footer-compact {
+  padding: 16px 0;
+}
+
+.footer-compact .footer-bottom {
+  border-top: none;
+  padding-top: 0;
+}
+
+.footer-compact-links {
+  margin-left: 16px;
+}
+
+.footer-compact-links a {
+  color: var(--light-text);
+  text-decoration: none;
+  margin-left: 16px;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.footer-compact-links a:hover {
+  color: var(--primary-color);
+}
+
+/* ─── Compact Marketplace Header (logged in) ───────────────────────────── */
+
+.marketplace-header-compact {
+  padding: 32px 0 0;
+}
+
+.marketplace-header-compact h1 {
+  font-size: 28px;
+  font-weight: 700;
+}
+
 /* ─── Buttons ───────────────────────────────────────────────────────────── */
 
 .btn {

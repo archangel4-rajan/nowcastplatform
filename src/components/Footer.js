@@ -1,7 +1,28 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 function Footer() {
+  const { user } = useAuth();
+
+  if (user) {
+    return (
+      <footer className="footer footer-compact">
+        <div className="container">
+          <div className="footer-bottom">
+            <p>
+              &copy; {new Date().getFullYear()} NowCast. All rights reserved.
+              <span className="footer-compact-links">
+                <Link to="/marketplace">Marketplace</Link>
+                <Link to="/contact">Contact</Link>
+              </span>
+            </p>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="footer">
       <div className="container">

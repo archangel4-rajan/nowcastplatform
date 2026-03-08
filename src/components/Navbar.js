@@ -24,18 +24,23 @@ function Navbar() {
 
         <div className={`nav-links ${menuOpen ? 'active' : ''}`}>
           <Link to="/marketplace" onClick={() => setMenuOpen(false)}>Marketplace</Link>
-          <Link to="/features" onClick={() => setMenuOpen(false)}>Features</Link>
-          <Link to="/about" onClick={() => setMenuOpen(false)}>About</Link>
           {user ? (
             <>
               <Link to="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
               {profile?.role === 'creator' && (
-                <Link to="/creator" onClick={() => setMenuOpen(false)}>Creator</Link>
+                <Link to="/creator" onClick={() => setMenuOpen(false)}>Creator Studio</Link>
               )}
-              <button onClick={signOut} className="btn btn-secondary">Sign Out</button>
+              <div className="nav-user">
+                <span className="nav-user-name">{profile?.name || 'User'}</span>
+                <button onClick={signOut} className="btn btn-secondary btn-sm">Sign Out</button>
+              </div>
             </>
           ) : (
-            <Link to="/login" className="btn btn-primary" onClick={() => setMenuOpen(false)}>Sign In</Link>
+            <>
+              <Link to="/features" onClick={() => setMenuOpen(false)}>Features</Link>
+              <Link to="/about" onClick={() => setMenuOpen(false)}>About</Link>
+              <Link to="/login" className="btn btn-primary" onClick={() => setMenuOpen(false)}>Sign In</Link>
+            </>
           )}
         </div>
       </div>
