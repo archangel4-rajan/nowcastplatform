@@ -24,27 +24,6 @@ function About() {
         </div>
       </section>
 
-      <section className="section section-alt">
-        <div className="container text-center">
-          <h2 className="section-title">Our Team</h2>
-          <p className="section-description">Meet the founder behind NowCast</p>
-          <div className="team-section">
-            <div className="team-member">
-              <h3>Rajan Anand</h3>
-              <p className="team-role">Founder & CEO</p>
-              <a
-                href="https://www.linkedin.com/in/rajan-anand/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary btn-sm"
-              >
-                LinkedIn
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="section">
         <div className="container">
           <h2 className="section-title">Our Values</h2>

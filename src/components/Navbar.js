@@ -28,7 +28,6 @@ function Navbar() {
         <div className={`nav-links ${menuOpen ? 'active' : ''}`}>
           <Link to="/marketplace" onClick={() => setMenuOpen(false)}>Marketplace</Link>
           <Link to="/features" onClick={() => setMenuOpen(false)}>Features</Link>
-          <Link to="/pricing" onClick={() => setMenuOpen(false)}>Pricing</Link>
           <Link to="/about" onClick={() => setMenuOpen(false)}>About</Link>
           {user ? (
             <>

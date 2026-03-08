@@ -83,7 +83,7 @@ function Solutions() {
           <p className="cta-subtitle">Whether you're a creator or a subscriber, NowCast is where strategies meet the market.</p>
           <div className="hero-buttons" style={{ justifyContent: 'center' }}>
             <Link to="/contact" className="btn btn-primary btn-lg">Join NowCast</Link>
-            <Link to="/pricing" className="btn btn-secondary btn-lg">View Pricing</Link>
+            <Link to="/features" className="btn btn-secondary btn-lg">View Features</Link>
           </div>
         </div>
       </section>

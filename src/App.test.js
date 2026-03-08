@@ -7,7 +7,7 @@
  *   - Navigation links present
  *   - Footer consistency
  *   - Contact form fields and validation
- *   - Pricing tiers and content accuracy
+ *   - Page content accuracy
  *   - About page values and team
  *   - Accessibility basics
  *   - Marketplace page
@@ -127,11 +127,6 @@ describe('Navigation', () => {
     expect(links.length).toBeGreaterThanOrEqual(1);
   });
 
-  test('has Pricing link', () => {
-    const links = screen.getAllByText('Pricing');
-    expect(links.length).toBeGreaterThanOrEqual(1);
-  });
-
   test('has About link', () => {
     const links = screen.getAllByText('About');
     expect(links.length).toBeGreaterThanOrEqual(1);
@@ -163,11 +158,6 @@ describe('Footer', () => {
 
   test('describes marketplace concept', () => {
     expect(screen.getByText(/marketplace for trading and investment strategies/i)).toBeInTheDocument();
-  });
-
-  test('has contact info', () => {
-    expect(screen.getByText('info@nowcast.com')).toBeInTheDocument();
-    expect(screen.getByText('(585) 910-9581')).toBeInTheDocument();
   });
 
   test('has copyright with current year', () => {
@@ -218,68 +208,7 @@ describe('Features Page', () => {
   });
 });
 
-// ─── Solutions Page ────────────────────────────────────────────────────────
 
-describe('Solutions Page', () => {
-  beforeEach(() => {
-    renderApp();
-    navigateTo('Features');
-    // Navigate back then to Solutions via footer
-    const links = screen.getAllByText('Pricing');
-    const footerLink = links.find(el => el.closest('.footer'));
-    if (footerLink) fireEvent.click(footerLink);
-  });
-
-  test('has pricing tiers', () => {
-    expect(screen.getByText('Explorer')).toBeInTheDocument();
-    expect(screen.getByText('Trader')).toBeInTheDocument();
-    expect(screen.getByText('Trader Pro')).toBeInTheDocument();
-  });
-});
-
-// ─── Pricing Page ──────────────────────────────────────────────────────────
-
-describe('Pricing Page', () => {
-  beforeEach(() => {
-    renderApp();
-    navigateTo('Pricing');
-  });
-
-  test('has subscriber tiers', () => {
-    expect(screen.getByText('Explorer')).toBeInTheDocument();
-    expect(screen.getByText('Trader')).toBeInTheDocument();
-    expect(screen.getByText('Trader Pro')).toBeInTheDocument();
-  });
-
-  test('has correct prices', () => {
-    expect(screen.getByText(/\$29/)).toBeInTheDocument();
-    expect(screen.getByText(/\$79/)).toBeInTheDocument();
-  });
-
-  test('has Most Popular badge', () => {
-    expect(screen.getByText('Most Popular')).toBeInTheDocument();
-  });
-
-  test('has Creator tier', () => {
-    const creatorHeadings = screen.getAllByText('Creator');
-    expect(creatorHeadings.length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/Free to publish/).length).toBeGreaterThanOrEqual(1);
-  });
-
-  test('has revenue split info', () => {
-    expect(screen.getByText(/80%/)).toBeInTheDocument();
-    expect(screen.getByText(/20%/)).toBeInTheDocument();
-  });
-
-  test('has revenue example', () => {
-    expect(screen.getByText(/\$4,000/)).toBeInTheDocument();
-  });
-
-  test('has FAQ', () => {
-    expect(screen.getByText('Frequently Asked Questions')).toBeInTheDocument();
-    expect(screen.getByText(/Can I cancel anytime/i)).toBeInTheDocument();
-  });
-});
 
 // ─── About Page ────────────────────────────────────────────────────────────
 
@@ -291,13 +220,6 @@ describe('About Page', () => {
 
   test('has mission section', () => {
     expect(screen.getByText('Our Mission')).toBeInTheDocument();
-  });
-
-  test('has Rajan Anand and LinkedIn', () => {
-    expect(screen.getByText('Rajan Anand')).toBeInTheDocument();
-    expect(screen.getByText(/Founder.*CEO/)).toBeInTheDocument();
-    const linkedIn = screen.getByText('LinkedIn');
-    expect(linkedIn).toHaveAttribute('href', 'https://www.linkedin.com/in/rajan-anand/');
   });
 
   test('has values', () => {
@@ -323,7 +245,8 @@ describe('Contact Page', () => {
   });
 
   test('renders page title', () => {
-    expect(screen.getByText('Get in Touch')).toBeInTheDocument();
+    const headings = screen.getAllByText('Get in Touch');
+    expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 
   test('has inquiry type dropdown', () => {
@@ -380,7 +303,6 @@ describe('Old concept removal', () => {
   const pagesToCheck = [
     { name: 'Landing', nav: null },
     { name: 'Features', nav: 'Features' },
-    { name: 'Pricing', nav: 'Pricing' },
     { name: 'About', nav: 'About' },
   ];
 

@@ -14,7 +14,6 @@ function Footer() {
             <h4>Product</h4>
             <Link to="/marketplace">Marketplace</Link>
             <Link to="/features">Features</Link>
-            <Link to="/pricing">Pricing</Link>
           </div>
           <div className="footer-section">
             <h4>Company</h4>
@@ -23,8 +22,7 @@ function Footer() {
           </div>
           <div className="footer-section">
             <h4>Contact</h4>
-            <p>info@nowcast.com</p>
-            <p>(585) 910-9581</p>
+            <Link to="/contact">Get in Touch</Link>
           </div>
         </div>
         <div className="footer-bottom">
