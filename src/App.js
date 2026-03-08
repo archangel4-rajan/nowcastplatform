@@ -10,7 +10,7 @@ import Solutions from './pages/Solutions';
 
 import About from './pages/About';
 import Contact from './pages/Contact';
-import AuthCallback from './pages/AuthCallback';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Marketplace from './pages/Marketplace';
 import StrategyDetail from './pages/StrategyDetail';
@@ -33,7 +33,7 @@ function App() {
 
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/login" element={<Login />} />
               <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/strategy/:id" element={<StrategyDetail />} />
               <Route

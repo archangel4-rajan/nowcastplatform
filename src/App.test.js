@@ -26,7 +26,8 @@ jest.mock('./lib/supabase', () => ({
       onAuthStateChange: () => ({
         data: { subscription: { unsubscribe: jest.fn() } },
       }),
-      signInWithOAuth: jest.fn(),
+      signInWithPassword: jest.fn().mockResolvedValue({ data: null, error: null }),
+      signUp: jest.fn().mockResolvedValue({ data: null, error: null }),
       signOut: jest.fn(),
     },
     from: () => ({
@@ -101,7 +102,7 @@ describe('Landing Page', () => {
 
   test('renders CTA section with sign-in', () => {
     expect(screen.getByText('Ready to trade smarter?')).toBeInTheDocument();
-    expect(screen.getByText('Get Started with Google')).toBeInTheDocument();
+    expect(screen.getByText('Get Started')).toBeInTheDocument();
   });
 
   test('does NOT contain old fintech copy', () => {

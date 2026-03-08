@@ -10,7 +10,7 @@ function ProtectedRoute({ children, requireCreator }) {
   }
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   if (requireCreator && profile?.role !== 'creator') {

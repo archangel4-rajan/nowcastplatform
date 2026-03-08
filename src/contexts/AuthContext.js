@@ -39,13 +39,22 @@ export function AuthProvider({ children }) {
     if (data) setProfile(data);
   }
 
-  async function signIn() {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin + '/auth/callback',
-      },
+  async function signInWithEmail(email, password) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
+    if (error) throw error;
+    return data;
+  }
+
+  async function signUpWithEmail(email, password) {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    if (error) throw error;
+    return data;
   }
 
   async function signOut() {
@@ -71,7 +80,8 @@ export function AuthProvider({ children }) {
     user,
     profile,
     loading,
-    signIn,
+    signInWithEmail,
+    signUpWithEmail,
     signOut,
     updateProfile,
     fetchProfile,

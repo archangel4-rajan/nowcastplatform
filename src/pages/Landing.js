@@ -1,9 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 
 function Landing() {
-  const { signIn } = useAuth();
 
   return (
     <div className="landing">
@@ -95,7 +93,7 @@ function Landing() {
         <div className="container text-center">
           <h2>Ready to trade smarter?</h2>
           <p className="cta-subtitle">Join NowCast and access proven strategies from top creators.</p>
-          <button onClick={signIn} className="btn btn-primary btn-lg">Get Started with Google</button>
+          <Link to="/login" className="btn btn-primary btn-lg">Get Started</Link>
         </div>
       </section>
     </div>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 function Navbar() {
-  const { user, profile, signIn, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -38,7 +38,7 @@ function Navbar() {
               <button onClick={signOut} className="btn btn-secondary">Sign Out</button>
             </>
           ) : (
-            <button onClick={signIn} className="btn btn-primary">Sign In</button>
+            <Link to="/login" className="btn btn-primary" onClick={() => setMenuOpen(false)}>Sign In</Link>
           )}
         </div>
       </div>
