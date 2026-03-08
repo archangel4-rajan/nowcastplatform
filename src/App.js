@@ -6,7 +6,6 @@ import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Features from './pages/Features';
-import Solutions from './pages/Solutions';
 
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -29,7 +28,6 @@ function App() {
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/features" element={<Features />} />
-              <Route path="/solutions" element={<Solutions />} />
 
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />

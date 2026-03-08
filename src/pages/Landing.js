@@ -15,7 +15,7 @@ function Landing() {
           </p>
           <div className="hero-buttons">
             <Link to="/marketplace" className="btn btn-primary btn-lg">Browse Strategies</Link>
-            <Link to="/solutions" className="btn btn-secondary btn-lg">Become a Creator</Link>
+            <Link to="/features" className="btn btn-secondary btn-lg">Become a Creator</Link>
           </div>
         </div>
       </section>

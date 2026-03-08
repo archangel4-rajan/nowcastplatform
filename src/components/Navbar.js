@@ -10,11 +10,8 @@ function Navbar() {
     <nav className="navbar">
       <div className="container nav-container">
         <Link to="/" className="logo">
-          <svg width="160" height="48" viewBox="0 0 160 48">
-            <text x="0" y="36" fontFamily="Inter, sans-serif" fontSize="32" fontWeight="700" fill="#2563eb">
-              NowCast
-            </text>
-          </svg>
+          <img src="/logo-icon.png" alt="" className="logo-icon" />
+          <span className="logo-text">NowCast</span>
         </Link>
 
         <button

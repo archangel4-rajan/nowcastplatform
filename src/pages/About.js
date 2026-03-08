@@ -56,7 +56,7 @@ function About() {
         <div className="container text-center">
           <h2>Join the Marketplace</h2>
           <p className="cta-subtitle">Whether you create strategies or follow them, NowCast is where the market meets.</p>
-          <Link to="/contact" className="btn btn-primary btn-lg">Get Started</Link>
+          <Link to="/login" className="btn btn-primary btn-lg">Get Started</Link>
         </div>
       </section>
     </div>
