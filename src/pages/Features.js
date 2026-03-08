@@ -17,7 +17,7 @@ function Features() {
             <div className="card">
               <div className="card-icon">&#128736;&#65039;</div>
               <h3>Strategy Builder</h3>
-              <p>Define your trading logic, entry and exit rules, position sizing, and risk parameters through an intuitive strategy editor. Support for equities, ETFs, and crypto assets.</p>
+              <p>Define your trading logic, entry and exit rules, position sizing, and risk parameters through an intuitive strategy editor. Support for equities, ETFs, crypto, and prediction markets.</p>
             </div>
             <div className="card">
               <div className="card-icon">&#128200;</div>

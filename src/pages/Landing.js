@@ -9,9 +9,9 @@ function Landing() {
         <div className="container">
           <h1>Trade Smarter with Proven Strategies</h1>
           <p className="hero-subtitle">
-            The marketplace where top strategy creators publish proprietary trading
-            strategies for equities and crypto — and you subscribe to the ones that
-            fit your goals.
+            The marketplace where top strategy creators publish proprietary strategies
+            for equities, crypto, and prediction markets — and you subscribe to the ones
+            that fit your goals.
           </p>
           <div className="hero-buttons">
             <Link to="/marketplace" className="btn btn-primary btn-lg">Browse Strategies</Link>
@@ -36,8 +36,8 @@ function Landing() {
             </div>
             <div className="card">
               <div className="card-icon">&#127760;</div>
-              <h3>Equities & Crypto</h3>
-              <p>Whether you trade stocks, ETFs, or digital assets, NowCast has strategies built for every market and every risk appetite.</p>
+              <h3>Equities, Crypto & Predictions</h3>
+              <p>Whether you trade stocks, ETFs, digital assets, or prediction markets like Polymarket and Kalshi — NowCast has strategies built for every market and every risk appetite.</p>
             </div>
           </div>
         </div>

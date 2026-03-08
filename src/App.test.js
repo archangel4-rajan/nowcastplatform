@@ -98,7 +98,7 @@ describe('Landing Page', () => {
     expect(screen.getByText('Why NowCast?')).toBeInTheDocument();
     expect(screen.getByText('Curated Strategies')).toBeInTheDocument();
     expect(screen.getByText('Transparent Performance')).toBeInTheDocument();
-    expect(screen.getByText('Equities & Crypto')).toBeInTheDocument();
+    expect(screen.getByText('Equities, Crypto & Predictions')).toBeInTheDocument();
   });
 
   test('renders How It Works section with 3 steps', () => {
