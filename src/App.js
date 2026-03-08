@@ -17,6 +17,8 @@ import CreatorDashboard from './pages/CreatorDashboard';
 import CreateStrategy from './pages/CreateStrategy';
 import ManagePortfolio from './pages/ManagePortfolio';
 import Wallet from './pages/Wallet';
+import Notifications from './pages/Notifications';
+import Leaderboard from './pages/Leaderboard';
 import './App.css';
 
 function HomeRoute() {
@@ -42,7 +44,16 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
               <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/strategy/:id" element={<StrategyDetail />} />
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute>
+                    <Notifications />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/dashboard"
                 element={

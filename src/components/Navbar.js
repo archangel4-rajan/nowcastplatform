@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import NotificationBell from './NotificationBell';
 
 function Navbar() {
   const { user, profile, signOut } = useAuth();
@@ -24,6 +25,7 @@ function Navbar() {
 
         <div className={`nav-links ${menuOpen ? 'active' : ''}`}>
           <Link to="/marketplace" onClick={() => setMenuOpen(false)}>Marketplace</Link>
+          <Link to="/leaderboard" onClick={() => setMenuOpen(false)}>Leaderboard</Link>
           {user ? (
             <>
               <Link to="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
@@ -31,6 +33,7 @@ function Navbar() {
               {profile?.role === 'creator' && (
                 <Link to="/creator" onClick={() => setMenuOpen(false)}>Creator Studio</Link>
               )}
+              <NotificationBell />
               <div className="nav-user">
                 <span className="nav-user-name">{profile?.name || 'User'}</span>
                 <button onClick={signOut} className="btn btn-secondary btn-sm">Sign Out</button>

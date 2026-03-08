@@ -1,7 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { TopStrategiesPreview } from './Leaderboard';
 
 function Landing() {
+  const [topStrategies, setTopStrategies] = useState([]);
+
+  useEffect(() => {
+    async function fetchTop() {
+      try {
+        // Try materialized view first
+        let { data, error } = await supabase
+          .from('nc_strategy_leaderboard')
+          .select('*')
+          .order('subscriber_count', { ascending: false })
+          .limit(3);
+
+        if (error || !data || data.length === 0) {
+          // Fallback: query strategies directly
+          const res = await supabase
+            .from('nc_strategies')
+            .select('*, nc_profiles(name)')
+            .eq('status', 'active')
+            .order('created_at', { ascending: false })
+            .limit(3);
+
+          const strats = res.data || [];
+          data = strats.map((s) => ({
+            strategy_id: s.id,
+            title: s.title,
+            creator_name: s.nc_profiles?.name || 'Unknown',
+            subscriber_count: 0,
+            total_trades: 0,
+            subscription_price: s.subscription_price,
+          }));
+        }
+
+        setTopStrategies(data || []);
+      } catch {
+        // Ignore - landing page still works without preview
+      }
+    }
+    fetchTop();
+  }, []);
 
   return (
     <div className="landing">
@@ -88,6 +129,8 @@ function Landing() {
           </div>
         </div>
       </section>
+
+      <TopStrategiesPreview strategies={topStrategies} />
 
       <section className="section section-cta">
         <div className="container text-center">

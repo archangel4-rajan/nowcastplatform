@@ -6,6 +6,7 @@ import { fetchBTCPrice } from '../lib/priceService';
 import { checkAndExecuteTrade } from '../lib/strategySimulator';
 import PortfolioTable from '../components/PortfolioTable';
 import CommentSection from '../components/CommentSection';
+import PerformanceCharts from '../components/PerformanceCharts';
 import TagBadge from '../components/TagBadge';
 
 const BENCHMARK_LABELS = {
@@ -581,6 +582,12 @@ function StrategyDetail() {
                 <span className="stat-label">Avg Loss</span>
               </div>
             </div>
+          </div>
+        )}
+
+        {trades.length > 0 && (
+          <div className="strategy-detail-section">
+            <PerformanceCharts trades={trades} simulationCapital={strategy.simulation_capital} />
           </div>
         )}
 
